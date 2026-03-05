@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 import { TSchema } from "@/schemas/forms"
+import { getRandomShipmentStatus, ShipmentStatus } from "@/lib/statuses"
 
 export const useSaveForm = create(
   persist<IState>(
@@ -11,7 +12,7 @@ export const useSaveForm = create(
     }),
     {
       name: "forms",
-      version: 0.1,
+      version: 0.2,
       storage: createJSONStorage(() => localStorage),
     },
   ),
@@ -20,8 +21,10 @@ export const useSaveForm = create(
 export const dispatchSaveForm = (form: TSchema) =>
   useSaveForm.setState((state) => {
     const id = uuidv4()
+    const createAt = new Date()
+    const status = getRandomShipmentStatus()
 
-    const objectData: State = { id, form }
+    const objectData: StateOrder = { id, createAt, status, form }
 
     return {
       ...state,
@@ -29,11 +32,21 @@ export const dispatchSaveForm = (form: TSchema) =>
     }
   })
 
-interface State {
+export const dispatchDelete = (id: string) =>
+  useSaveForm.setState((state) => {
+    return {
+      ...state,
+      forms: state.forms.filter((item) => item.id != id),
+    }
+  })
+
+export interface StateOrder {
   id: string
+  createAt: Date
+  status: ShipmentStatus
   form: TSchema
 }
 
 interface IState {
-  forms: State[]
+  forms: StateOrder[]
 }

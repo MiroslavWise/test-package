@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cx } from "@/helpers/cx"
+import { useContextCheck } from "@/context/form"
 import { ENamePath, IndexPath, NumberPath } from "@/types"
 
 function getIndexActivePrev(path: string) {
@@ -31,6 +32,7 @@ function getIndexActiveNext(path: string) {
 }
 
 function FooterButtons() {
+  const { check } = useContextCheck()
   const path = usePathname()
   const prev = getIndexActivePrev(path)
   const next = getIndexActiveNext(path)
@@ -56,8 +58,9 @@ function FooterButtons() {
         />
         <button
           type="submit"
+          disabled={!check}
           className={cx(
-            "w-full max-w-31 h-10 flex items-center justify-center text-sm font-semibold text-white rounded-md bg-[#111827] transition-opacity",
+            "w-full max-w-31 h-10 flex items-center justify-center text-sm font-semibold text-white rounded-md bg-[#111827] transition-opacity disabled:opacity-50 cursor-not-allowed",
             next == path ? "opacity-100 cursor-pointer" : "hidden",
           )}
           dangerouslySetInnerHTML={{ __html: "Отправить" }}

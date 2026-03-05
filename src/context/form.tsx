@@ -1,12 +1,24 @@
-import { FormProvider, useForm } from "react-hook-form"
-import { PropsWithChildren, useEffect, useState } from "react"
+"use client"
 
-import { ETypeCargo } from "@/types"
+import { useRouter } from "next/navigation"
+import { FormProvider, useForm } from "react-hook-form"
+import { createContext, Dispatch, PropsWithChildren, SetStateAction, useContext, useEffect, useState } from "react"
+
+import { EPath, ETypeCargo } from "@/types"
 import { resolver, TSchema } from "@/schemas/forms"
 import { dispatchSaveForm } from "@/stores/save-form"
 
+const create = createContext<IContext>({ check: false, setCheck: () => {} })
+
+interface IContext {
+  check: boolean
+  setCheck: Dispatch<SetStateAction<boolean>>
+}
+
 function ProviderForm({ children }: PropsWithChildren) {
+  const [check, setCheck] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { push } = useRouter()
 
   const methods = useForm<TSchema>({
     defaultValues: {
@@ -22,13 +34,14 @@ function ProviderForm({ children }: PropsWithChildren) {
   })
 
   const onSubmit = methods.handleSubmit(async (values) => {
-    if (loading) return
+    if (loading || check) return
     setLoading(true)
 
     try {
       dispatchSaveForm(values)
       requestAnimationFrame(() => {
         methods.reset()
+        push(EPath.ORDERS)
       })
     } catch (e) {
     } finally {
@@ -45,16 +58,23 @@ function ProviderForm({ children }: PropsWithChildren) {
   }, [methods.formState.errors])
 
   return (
-    <FormProvider
-      {...methods}
+    <create.Provider
+      value={{ check, setCheck }}
       children={
-        <form className="w-full flex flex-col" onSubmit={onSubmit}>
-          {children}
-        </form>
+        <FormProvider
+          {...methods}
+          children={
+            <form className="w-full flex flex-col" onSubmit={onSubmit}>
+              {children}
+            </form>
+          }
+        />
       }
     />
   )
 }
+
+export const useContextCheck = () => useContext(create)
 
 ProviderForm.displayName = "ProviderForm"
 export default ProviderForm

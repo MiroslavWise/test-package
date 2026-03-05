@@ -1,7 +1,11 @@
 export const enum ENamePath {
-  SENDER = "/",
+  SENDER = "/sender",
   RECIPIENT = "/recipient",
   SUBMIT = "/submit",
+}
+
+export const enum EPath {
+  ORDERS = "/orders",
 }
 
 export interface IPropsStep {

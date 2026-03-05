@@ -10,6 +10,8 @@ import { OPTIONS_CITY } from "@/lib/cities"
 import { OPTIONS_CARGO } from "@/lib/cargo"
 import { type TSchema } from "@/schemas/forms"
 import { getPathTo, getValidName, NAME, type Rr } from "@/lib/form"
+import { cx } from "@/helpers/cx"
+import { useContextCheck } from "@/context/form"
 
 function arrayData(watch: UseFormWatch<TSchema>) {
   return (Object.keys(NAME) as Rr[]).map((item) => {
@@ -45,6 +47,7 @@ function arrayData(watch: UseFormWatch<TSchema>) {
 }
 
 export default () => {
+  const { check, setCheck } = useContextCheck()
   const {
     watch,
     formState: { errors },
@@ -95,6 +98,10 @@ export default () => {
           </div>
         </div>
       ) : null}
+      <div className="w-full grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 cursor-pointer" onClick={() => setCheck((_) => !_)}>
+        <div className={cx("w-full h-auto rounded-sm aspect-square border-2 border-black/80", check ? "bg-black/80" : "bg-gray-100")} />
+        <span className="text-base font-medium">Потвердите нажатием, что вы готовы отправить свои данные куда-то там...</span>
+      </div>
     </div>
   )
 }
