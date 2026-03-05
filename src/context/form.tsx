@@ -34,7 +34,7 @@ function ProviderForm({ children }: PropsWithChildren) {
   })
 
   const onSubmit = methods.handleSubmit(async (values) => {
-    if (loading || check) return
+    if (loading) return
     setLoading(true)
 
     try {
